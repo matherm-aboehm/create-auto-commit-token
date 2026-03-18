@@ -4,6 +4,25 @@ set -eo pipefail
 OWNER=${INPUT_OWNER:-""}
 REPOSITORIES=${INPUT_REPOSITORIES:-""}
 INPUT_GITHUB_API_URL=${INPUT_GITHUB_API_URL:-$GITHUB_API_URL}
+GITHUB_ACTION_REF=${GITHUB_ACTION_REF:-$GITHUB_HEAD_REF}
+GITHUB_ACTION_REF=${GITHUB_ACTION_REF:-$GITHUB_REF_NAME}
+export GH_REPO=${GITHUB_ACTION_REPOSITORY:-$GITHUB_REPOSITORY}
+export GH_TOKEN=$GITHUB_TOKEN
+
+if [ -z "$GH_TOKEN" ]; then
+  echo "GITHUB_TOKEN environment variable is empty"
+  exit 1
+fi
+
+if [ -z "$GH_REPO" ]; then
+  echo "The GitHub environment vars for the repository the action is running from were not set.";
+  exit 1;
+fi
+
+if [ -z "$GITHUB_ACTION_REF" ]; then
+  echo "The GitHub environment vars for the branch the action is running from were not set.";
+  exit 1;
+fi
 
 echo "Generate token for $OWNER/{$REPOSITORIES}";
 
@@ -34,8 +53,6 @@ if [ ${gh_version_parts[0]} -lt 2 ] || [ ${gh_version_parts[1]} -lt 87 ]; then
   exit 1
 fi
 
-export GH_REPO=$GITHUB_ACTION_REPOSITORY
-export GH_TOKEN=$GITHUB_TOKEN
 # returns the run URL since version 2.87.0:
 # https://github.com/cli/cli/issues/4001
 # https://github.blog/changelog/2026-02-19-workflow-dispatch-api-now-returns-run-ids/
