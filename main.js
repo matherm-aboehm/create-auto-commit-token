@@ -23,6 +23,7 @@ const repositories = core
 
 const skipTokenRevoke = core.getBooleanInput("skip-token-revoke");
 const github_api_url = core.getInput("github-api-url").replace(/\/$/, "");
+const github_token = core.getInput("github-token");
 
 /**
  * @param {string} cmd
@@ -118,6 +119,7 @@ const main = async (
       INPUT_OWNER: parsedOwner,
       INPUT_REPOSITORIES: parsedRepositoryNames.join(","),
       INPUT_GITHUB_API_URL: github_api_url,
+      INPUT_GITHUB_TOKEN: github_token,
       GITHUB_ACTION_PATH: workingDir
     }
   });

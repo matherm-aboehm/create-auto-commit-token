@@ -20,6 +20,10 @@ inputs:
   github-api-url:
     description: The URL of the GitHub REST API.
     default: ${{ github.api_url }}
+  github-token:
+    description: 'GitHub token or PAT token'
+    required: false
+    default: ${{ github.token }}
 outputs:
   token:
     description: "GitHub installation access token"
