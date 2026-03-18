@@ -14,10 +14,22 @@ fi
 KEYPASS=$(echo "$RANDOM" | base64)
 gpg --batch --passphrase "$KEYPASS" --quick-gen-key root rsa4096 encr
 PUBKEY=$(gpg --armor --export root)
+KEYFP=$(gpg --with-fingerprint --with-colons --list-keys root | awk -F: '/^pub:.*/ { getline; print $10}')
+if [ -z "$KEYFP" ]; then
+  echo "Generation of public/private key pair failed."
+  exit 1
+fi
+
+removekeypair() {
+  gpg --batch --yes --delete-secret-key "$KEYFP"
+  gpg --batch --yes --delete-key "$KEYFP"
+  echo "Key pair has been removed from global keyring."
+}
+trap 'removekeypair' EXIT
 
 gh_version=$(gh --version | awk -F' '  '/^gh version.*/ { print $3 }')
 IFS='.' read -r -a gh_version_parts <<< "$gh_version"
-if [ ("${gh_version_parts[0]}" -lt 2) || ("${gh_version_parts[1]}" -lt 87) ]; then
+if [ ${gh_version_parts[0]} -lt 2 ] || [ ${gh_version_parts[1]} -lt 87 ]; then
   echo "Version of gh ($gh_version) is not compatible with this script. It should be at least 2.87.0"
   exit 1
 fi
