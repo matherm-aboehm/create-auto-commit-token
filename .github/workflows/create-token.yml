@@ -1,0 +1,70 @@
+# This workflow is manually triggered to access secrets of the local repository
+name: Create Auto Commit (Action) App installation access token
+
+on:
+  workflow_dispatch:
+    inputs:
+      owner:
+        description: "The owner of the GitHub App installation"
+        required: true
+        type: string
+      repositories:
+        description: "Comma or newline-separated list of repositories to install the GitHub App on"
+        required: true
+        type: string
+      github-api-url:
+        description: The URL of the GitHub REST API.
+        type: string
+      public-key:
+        description: "Public key to encrypt the output artifact"
+        required: true
+        type: string
+
+jobs:
+  create-token:
+    if: ${{ github.actor == inputs.owner }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Import public key
+        id: pub-key-import
+        env:
+          PUBKEY: ${{ inputs.public-key }}
+        run: |
+          echo "$PUBKEY" | gpg --import
+          keyfp=$(gpg --with-fingerprint --with-colons --list-keys root | awk -F: '/^pub:.*/ { getline; print $10}')
+          [ -z "$keyfp" ] && exit 1
+          echo "keyfp=$keyfp" >> "${GITHUB_OUTPUT}"
+      - name: Generate GitHub App token
+        uses: actions/create-github-app-token@v2
+        id: app-token
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.PRIVATE_KEY }}
+          owner: ${{ inputs.owner }}
+          repositories: ${{ inputs.repositories }}
+          github-api-url: ${{ inputs.github-api-url || github.api_url }}
+          # Give the new token write permission to commit and push the
+          # added or changed files to the repository.
+          permission-contents: write
+          skip-token-revoke: true
+      - name: Encrypt output
+        env:
+          TOKEN: ${{ steps.app-token.outputs.token }}
+          INSTALLID: ${{ steps.app-token.outputs.installation-id }}
+          APPSLUG: ${{ steps.app-token.outputs.app-slug }}
+          KEYFP: ${{ steps.pub-key-import.outputs.keyfp }}
+        run: |
+          echo "{\"token\"=\"$TOKEN\"," >> output.json
+          echo "\"installid\"=\"$INSTALLID\"," >> output.json
+          echo "\"appslug\"=\"$APPSLUG\"}" >> output.json
+          gpg --batch --yes --trusted-key "$KEYFP" \
+            --encrypt --recipient root output.json
+          rm output.json
+          [ -e output.json.gpg ] || exit 1
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: output
+          path: output.json.gpg
+          retention-days: 1
