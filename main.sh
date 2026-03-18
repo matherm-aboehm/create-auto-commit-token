@@ -24,11 +24,11 @@ if [ -z "$GITHUB_ACTION_REF" ]; then
   exit 1;
 fi
 
-echo "Generate token for $OWNER/{$REPOSITORIES}";
-
 if [ -n "${GITHUB_ACTION_PATH}" ]; then
   cd "${GITHUB_ACTION_PATH}"
 fi
+
+echo "Generate key pair for encrypting workflow output";
 
 KEYPASS=$(echo "$RANDOM" | base64)
 gpg --batch --passphrase "$KEYPASS" --quick-gen-key root rsa4096 encr
@@ -53,6 +53,7 @@ if [ ${gh_version_parts[0]} -lt 2 ] || [ ${gh_version_parts[1]} -lt 87 ]; then
   exit 1
 fi
 
+echo "Starting create-token.yml workflow"
 # returns the run URL since version 2.87.0:
 # https://github.com/cli/cli/issues/4001
 # https://github.blog/changelog/2026-02-19-workflow-dispatch-api-now-returns-run-ids/
@@ -67,11 +68,13 @@ if [ -z "$RUN_ID" ]; then
   exit 1;
 fi
 
-# wait for the workflow run to complete
+echo "Waiting for workflow run $RUN_ID to complete..."
 gh run watch $RUN_ID --exit-status > /dev/null 2>&1
 
+echo "Downloading encrypted output artifact"
 gh run download $RUN_ID -n output
 
+echo "Decrypt workflow output"
 gpg --passphrase "$KEYPASS" --output output.json --decrypt output.json.gpg
 
 [ -e output.json ] || {
