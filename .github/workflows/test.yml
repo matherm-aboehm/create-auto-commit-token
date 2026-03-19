@@ -42,7 +42,7 @@ jobs:
       - uses: ./ # Uses the action in the root directory
         id: test-without-app-installation
         continue-on-error: true
-      - name: Fail when test without app installtion succeeds
+      - name: Fail when test without app installation succeeds
         run: |
           exit 1
         if: ${{ steps.test-without-app-installation.outcome == 'success' }}
