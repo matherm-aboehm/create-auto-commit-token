@@ -1,0 +1,38 @@
+name: release
+
+on:
+  push:
+    branches:
+      - "*.x"
+      - main
+      - beta
+
+permissions:
+  actions: write
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  release:
+    name: release
+    runs-on: ubuntu-latest
+    steps:
+      # build local version to create token
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: package.json
+
+      - run: npm ci
+      - run: npm run build
+      - uses: ./
+        id: app-token
+      # install release dependencies and release
+      - run: npm install --no-save @semantic-release/git semantic-release-plugin-github-breaking-version-tag
+      - run: npx semantic-release --debug
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
