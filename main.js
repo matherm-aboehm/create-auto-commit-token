@@ -113,7 +113,7 @@ const main = async (
 
   let workingDir = process.env.GITHUB_ACTION_PATH || path.join(__dirname, '..');
 
-  await exec('bash', [path.join(workingDir, './main.sh')], {
+  await exec('bash', (core.isDebug() ? ['-x'] : []).concat(path.join(workingDir, './main.sh')), {
     env: {
       ...process.env,
       INPUT_OWNER: parsedOwner,
@@ -133,6 +133,8 @@ const main = async (
       type: "json"
     }    
   });
+
+  core.info(JSON.stringify(output));
 
   core.setSecret(output.token);
 
