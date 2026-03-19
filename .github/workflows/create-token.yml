@@ -22,7 +22,6 @@ on:
 
 jobs:
   create-token:
-    if: ${{ github.actor == inputs.owner }}
     runs-on: ubuntu-latest
 
     steps:
