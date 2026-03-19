@@ -77,7 +77,10 @@ gh run download $RUN_ID -n output
 echo "Decrypt workflow output"
 # set gpg specific env var for GitHub action runner, see:
 # https://stackoverflow.com/questions/51504367/gpg-agent-forwarding-inappropriate-ioctl-for-device
-GPG_TTY=$(tty) gpg --batch --passphrase "$KEYPASS" --output output.json --decrypt output.json.gpg
+export GPG_TTY=$(tty)
+# gpg ignores --passphrase* option even when combined with --batch
+# https://unix.stackexchange.com/questions/60213/gpg-asks-for-password-even-with-passphrase
+echo "$KEYPASS" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --output output.json --decrypt output.json.gpg
 
 [ -e output.json ] || {
   echo "Decryption of workflow run output failed."
