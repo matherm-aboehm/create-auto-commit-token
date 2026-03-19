@@ -54,9 +54,9 @@ jobs:
           APPSLUG: ${{ steps.app-token.outputs.app-slug }}
           KEYFP: ${{ steps.pub-key-import.outputs.keyfp }}
         run: |
-          echo "{\"token\"=\"$TOKEN\"," >> output.json
-          echo "\"installid\"=\"$INSTALLID\"," >> output.json
-          echo "\"appslug\"=\"$APPSLUG\"}" >> output.json
+          echo "{\"token\":\"$TOKEN\"," >> output.json
+          echo "\"installid\":\"$INSTALLID\"," >> output.json
+          echo "\"appslug\":\"$APPSLUG\"}" >> output.json
           gpg --batch --yes --trusted-key "$KEYFP" \
             --encrypt --recipient root output.json
           rm output.json
