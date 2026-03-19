@@ -46,6 +46,8 @@ jobs:
           # Give the new token write permission to commit and push the
           # added or changed files to the repository.
           permission-contents: write
+          permission-issues: write
+          permission-pull-requests: write
           skip-token-revoke: true
       - name: Encrypt output
         env:
