@@ -41,6 +41,8 @@ jobs:
       - run: npm run build
       - uses: ./ # Uses the action in the root directory
         id: test-without-app-installation
+        with:
+          repositories: non-existent
         continue-on-error: true
       - name: Fail when test without app installation succeeds
         run: |
