@@ -1,7 +1,7 @@
 // @ts-check
 
 import * as core from "@actions/core";
-import { spawn } from "child_process";
+import * as pty from "node-pty";
 import * as path from "path";
 import * as http from "http";
 import * as https from "https";
@@ -27,11 +27,11 @@ const github_token = core.getInput("github-token");
 
 /**
  * @param {string} cmd
- * @param {readonly string[]} args
+ * @param {string[]} args
  */
-const exec = (cmd, args = [], options = {}) => new Promise((resolve, reject) =>
-    spawn(cmd, args, { stdio: 'inherit', ...options })
-        .on('close', code => {
+const exec = (cmd, args = [], options = {}) => new Promise((resolve, reject) => {
+    const proc = pty.spawn(cmd, args, { name: 'xterm-256color', ...options });
+    proc.onExit(({ exitCode: code }) => {
             if (code !== 0) {
                 return reject(Object.assign(
                     new Error(`Invalid exit code: ${code}`),
@@ -39,9 +39,9 @@ const exec = (cmd, args = [], options = {}) => new Promise((resolve, reject) =>
                 ));
             };
             return resolve(code);
-        })
-        .on('error', reject)
-);
+        });
+    proc.onData(data => process.stdout.write(data));
+});
 
 /**
  * @param {string} owner
