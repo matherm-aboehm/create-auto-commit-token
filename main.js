@@ -126,15 +126,13 @@ const main = async (
 
 
   /**
-   * @type { { token: string, installid: string, appslug: string} }
+   * @type { { default: { token: string, installid: string, appslug: string } } }
    */
-  const output = await import(path.join(workingDir, './output.json'), {
+  const { default: output } = await import(path.join(workingDir, './output.json'), {
     with: {
       type: "json"
     }    
   });
-
-  core.info(JSON.stringify(output));
 
   core.setSecret(output.token);
 
