@@ -75,7 +75,9 @@ echo "Downloading encrypted output artifact"
 gh run download $RUN_ID -n output
 
 echo "Decrypt workflow output"
-gpg --passphrase "$KEYPASS" --output output.json --decrypt output.json.gpg
+# set gpg specific env var for GitHub action runner, see:
+# https://stackoverflow.com/questions/51504367/gpg-agent-forwarding-inappropriate-ioctl-for-device
+GPG_TTY=$(tty) gpg --batch --passphrase "$KEYPASS" --output output.json --decrypt output.json.gpg
 
 [ -e output.json ] || {
   echo "Decryption of workflow run output failed."
