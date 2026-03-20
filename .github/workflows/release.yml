@@ -32,7 +32,8 @@ jobs:
       - uses: ./
         id: app-token
       # install release dependencies and release
-      - run: npm install --no-save @semantic-release/git semantic-release-plugin-github-breaking-version-tag
+      - run: npm install --no-save @jno21/semantic-release-github-commit semantic-release-plugin-github-breaking-version-tag
       - run: npx semantic-release --debug
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}

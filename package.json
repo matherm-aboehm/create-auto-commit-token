@@ -50,14 +50,14 @@
       "@semantic-release/npm",
       "semantic-release-plugin-github-breaking-version-tag",
       [
-        "@semantic-release/git",
+        "@jno21/semantic-release-github-commit",
         {
-          "assets": [
+          "files": [
             "package.json",
             "package-lock.json",
             "dist/**"
           ],
-          "message": "build(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+          "commitMessage": "build(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
         }
       ]
     ]
