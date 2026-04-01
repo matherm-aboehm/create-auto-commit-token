@@ -20,7 +20,7 @@
     "@actions/core": "^3.0.0",
     "@octokit/request": "^10.0.8",
     "node-pty": "^1.2.0-beta.12",
-    "undici": "^7.24.1"
+    "undici": "^7.24.7"
   },
   "devDependencies": {
     "@octokit/openapi": "^21.0.0",
