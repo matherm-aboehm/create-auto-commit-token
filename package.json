@@ -50,7 +50,7 @@
       "@semantic-release/npm",
       "semantic-release-plugin-github-breaking-version-tag",
       [
-        "@jno21/semantic-release-github-commit",
+        "@matherm-aboehm/semantic-release-github-commit",
         {
           "files": [
             "package.json",
