@@ -22214,7 +22214,7 @@ var main = async (owner2, repositories2, core, skipTokenRevoke2) => {
     );
   }
   let workingDir = process.env.GITHUB_ACTION_PATH || path6.join(__dirname, "..");
-  await exec2("bash", [path6.join(workingDir, "./main.sh")], {
+  await exec2("bash", (core.isDebug() ? ["-x"] : []).concat(path6.join(workingDir, "./main.sh")), {
     env: {
       ...process.env,
       INPUT_OWNER: parsedOwner,
@@ -22224,7 +22224,7 @@ var main = async (owner2, repositories2, core, skipTokenRevoke2) => {
       GITHUB_ACTION_PATH: workingDir
     }
   });
-  const output = await import(path6.join(workingDir, "./output.json"), {
+  const { default: output } = await import(path6.join(workingDir, "./output.json"), {
     with: {
       type: "json"
     }
