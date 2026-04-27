@@ -111,7 +111,14 @@ const main = async (
       Owner of current repository:${String(process.env.GITHUB_REPOSITORY_OWNER)}`);
   }
 
-  let workingDir = process.env.GITHUB_ACTION_PATH || path.join(__dirname, '..');
+  // __dirname only available in CJS not ESM and import.meta.dirname
+  // is only available in ESM, so let esbuild replace
+  // import.meta.dirname with path.join(__dirname, '..')
+  // see:
+  // https://nodejs.org/api/esm.html#differences-between-es-modules-and-commonjs
+  // https://nodejs.org/api/esm.html#importmetadirname
+  // https://github.com/evanw/esbuild/issues/1492
+  let workingDir = process.env.GITHUB_ACTION_PATH || import.meta.dirname;
 
   await exec('bash', (core.isDebug() ? ['-x'] : []).concat(path.join(workingDir, './main.sh')), {
     env: {

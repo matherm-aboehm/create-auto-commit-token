@@ -9,7 +9,7 @@
   },
   "packageManager": "npm@10.9.4",
   "scripts": {
-    "build": "esbuild main.js post.js --bundle --outdir=dist --out-extension:.js=.cjs --platform=node --target=node24.0.0 --packages=bundle",
+    "build": "esbuild main.js post.js --bundle --inject:import-meta-dirname.js --outdir=dist --out-extension:.js=.cjs --platform=node --target=node24.0.0 --packages=bundle",
     "postbuild": "shx cp -r node_modules/node-pty/prebuilds/linux-x64 dist/prebuilds/",
     "test": "c8 --100 ava tests/index.js",
     "coverage": "c8 report --reporter html",
