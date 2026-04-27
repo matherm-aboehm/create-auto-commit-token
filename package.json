@@ -25,11 +25,13 @@
   "devDependencies": {
     "@octokit/openapi": "^21.0.0",
     "@sinonjs/fake-timers": "^15.1.0",
+    "@types/jest": "^30.0.0",
     "ava": "^6.4.1",
     "c8": "^10.1.3",
     "dotenv": "^17.3.1",
     "esbuild": "^0.27.3",
     "execa": "^9.6.1",
+    "jest": "^30.3.0",
     "open-cli": "^8.0.0",
     "shx": "^0.4.0",
     "yaml": "^2.8.2"
