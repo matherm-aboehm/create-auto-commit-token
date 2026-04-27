@@ -1,4 +1,5 @@
 import { readdirSync } from "node:fs";
+import { stripVTControlCharacters } from "node:util";
 
 import test from "ava";
 import { execa } from "execa";
@@ -7,7 +8,7 @@ import { execa } from "execa";
 const files = readdirSync("tests");
 
 // Files to ignore
-const ignore = ["index.js", "main.js", "README.md", "snapshots"];
+const ignore = ["index.js", "main.js", "jest-mocks.js", "wrap-in-jest.js", "README.md", "snapshots"];
 
 const testFiles = files.filter((file) => !ignore.includes(file));
 
@@ -22,8 +23,14 @@ for (const file of testFiles) {
       GITHUB_OUTPUT: undefined,
       GITHUB_STATE: undefined,
     };
-    const { stderr, stdout } = await execa("node", [`tests/${file}`], { env });
-    t.snapshot(stderr, "stderr");
-    t.snapshot(stdout, "stdout");
+    // jest needs `--experimental-vm-modules` for ESM support, but this outputs
+    // a runtime specific warning (process id is included) and snapshotting this
+    // would result in failing tests. So, to resolve this all experimental warnings
+    // are disabled for now.
+    const { stderr, stdout } = await execa("node", ['--experimental-vm-modules', '--disable-warning=ExperimentalWarning', `tests/${file}`], { env });
+    // jest can output with ANSI escape codes for colorized console output, but
+    // markdown of the snapshot doesn't support this, so remove these characters here.
+    t.snapshot(stripVTControlCharacters(stderr), "stderr");
+    t.snapshot(stripVTControlCharacters(stdout), "stdout");
   });
 }
