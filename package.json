@@ -23,7 +23,7 @@
     "undici": "^7.24.1"
   },
   "devDependencies": {
-    "@octokit/openapi": "^21.0.0",
+    "@octokit/openapi": "^22.0.0",
     "@sinonjs/fake-timers": "^15.1.0",
     "@types/jest": "^30.0.0",
     "ava": "^8.0.0",
