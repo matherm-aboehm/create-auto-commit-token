@@ -35,10 +35,10 @@ jobs:
           [ -z "$keyfp" ] && exit 1
           echo "keyfp=$keyfp" >> "${GITHUB_OUTPUT}"
       - name: Generate GitHub App token
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@v3
         id: app-token
         with:
-          app-id: ${{ secrets.APP_ID }}
+          client-id: ${{ secrets.CLIENT_ID }}
           private-key: ${{ secrets.PRIVATE_KEY }}
           owner: ${{ inputs.owner }}
           repositories: ${{ inputs.repositories }}
